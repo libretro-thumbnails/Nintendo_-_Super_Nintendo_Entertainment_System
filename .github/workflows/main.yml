@@ -1,0 +1,23 @@
+name: Generate File Listing
+
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Current Date
+        id: date
+        run: echo "builddate=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Get Tree
+        run: |
+          echo Starting File Lister
+          git ls-files | grep -E ".*\.(png)" > $(basename $(git rev-parse --show-toplevel))_tree.txt
+      - name: Update Tree
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update File Tree ${{ steps.date.outputs.builddate }}
+          repository: .
+          commit_options: '--amend'
+          push_options: '--force'
+          commit_user_name: GitHub Actions Bot
