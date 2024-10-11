@@ -11,16 +11,40 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check Image Types
         run: |
-          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f | awk '{print $1}') \
-            if [ ! -z "$badfiletypes" ]; then echo "Bad types found\n$badfiletypes"; else echo "All files passed file type check";fi \
-            if [[ ! -z "$badfiletypes" ]]; then exit 1; else exit 0;fi
+          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f | awk '{print $1}')
+            if [ ! -z "$badfiletypes" ]; then
+              echo "Bad types found\n$badfiletypes"
+            else
+              echo "All files passed file type check"
+            fi
+            if [[ ! -z "$badfiletypes" ]]; then
+              exit 1
+            else
+              exit 0
+            fi
       - name: Check Image Filenames
         run: |
-          badfilenames=$(find ${{ github.workspace }} -iregex '.\/.*[<>&:`"\|\?\\\/\*].*' -type f | awk '{print $1}') \
-            if [ ! -z "$badfilenames" ]; then echo "Bad chars found\n$badfilenames"; else echo "All files passed file names check";fi \
-            if [[ ! -z "$badfilenames" ]]; then exit 1; else exit 0;fi
+          badfilenames=$(find ${{ github.workspace }} -iregex '.\/.*[<>&:`"\|\?\\\/\*].*' -type f | awk '{print $1}')
+            if [ ! -z "$badfilenames" ]; then
+              echo "Bad chars found\n$badfiletypes"
+            else
+              echo "All files passed file name check"
+            fi
+            if [[ ! -z "$badfilenames" ]]; then
+              exit 1
+            else
+              exit 0
+            fi
       - name: Check Image Sizes
         run: |
           badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}') \
-            if [ ! -z "$badfilesizes" ]; then echo "Bad file sizes found\n$badfilesizes"; else echo "All files passed file size check";fi \
-            if [[ ! -z "$badfilesizes" ]]; then exit 1; else exit 0;fi
+            if [ ! -z "$badfilesizes" ]; then
+              echo "Bad file sizes found\n$badfilesizes"
+            else
+              echo "All files passed file size check"
+            fi
+            if [[ ! -z "$badfilesizes" ]]; then
+              exit 1
+            else
+              exit 0
+            fi
