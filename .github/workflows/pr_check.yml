@@ -43,12 +43,12 @@ jobs:
         if: always()
         run: |
           pass=0
-          for f in $(find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*')
+          find . -iname "*.png" -type f -not -path '*/.*' -print0 | while read -d $'\0' file
             do
-              if [ -f "$f" ]; then
-                w=$(identify -format '%w' "$f")
-                if [ w>512 ]; then
-                  echo "File size too wide ($w pixels): $f"
+              if [ -f "$file" ]; then
+                w=$(identify -format '%w' "$file")
+                if [ $w -gt 512 ]; then
+                  echo "File size too wide ($w pixels): $file"
                   pass=1
                 fi
               fi
