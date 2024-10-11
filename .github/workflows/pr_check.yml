@@ -12,7 +12,7 @@ jobs:
       - name: Check Image Types
         if: always()
         run: |
-          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f -not -path '*/.*' | awk '{print $1}')
+          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f -not -path '*/.*')
             if [ ! -z "$badfiletypes" ]; then
               echo "Bad types found"
               echo $badfiletypes
@@ -27,7 +27,7 @@ jobs:
       - name: Check Image Filenames
         if: always()
         run: |
-          badfilenames=$(find ${{ github.workspace }} -iregex '.*[<>&:`"\|\?\\\/\*].*' -type f -not -path '*/.*' | awk '{print $1}')
+          badfilenames=$(find ${{ github.workspace }} -name '*[<>`?|"&*\\\/]*' -type f -not -path '*/.*')
             if [ ! -z "$badfilenames" ]; then
               echo "Bad chars found"
               echo $badfilenames
@@ -42,15 +42,15 @@ jobs:
       - name: Check Image Sizes
         if: always()
         run: |
-          badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*' -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}')
-            if [ ! -z "$badfilesizes" ]; then
-              echo "Bad file sizes found"
-              echo $badfilesizes
-            else
-              echo "All files passed file size check"
-            fi
-            if [[ ! -z "$badfilesizes" ]]; then
-              exit 1
-            else
-              exit 0
-            fi
+          pass=0
+          for f in $(find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*')
+            do
+              if [ -f "$f" ]; then
+                w=$(identify -format '%w' "$f")
+                if [ w>512 ]; then
+                  echo "File size too wide ($w pixels): $f"
+                  pass=1
+                fi
+              fi
+            done
+          exit $pass
