@@ -12,15 +12,33 @@ jobs:
       - name: Check Image Types
         run: |
           badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f | awk '{print $1}') \
-            [[ ! -z "$badfiletypes" ]] && echo "Bad types found\n$badfiletypes" || echo "All files passed file type check" \
-            [[ ! -z "$badfiletypes" ]] && exit 1 || exit 0
+            if [[ ! -z "$badfiletypes" ]]; then \
+              echo "Bad types found\n$badfiletypes"; \
+            else \
+              echo "All files passed file type check" \
+            if [[ ! -z "$badfiletypes" ]]; then \
+              exit 1 \
+            else \
+              exit 0 \
       - name: Check Image Filenames
         run: |
           badfilenames=$(find ${{ github.workspace }} -iregex '.\/.*[<>&:`"\|\?\\\/\*].*' -type f | awk '{print $1}') \
-            [[ ! -z "$badfilenames" ]] && echo "Bad chars found\n$badfilenames" || echo "All files passed file names check" \
-            [[ ! -z "$badfilenames" ]] && exit 1 || exit 0
+            if [[ ! -z "$badfilenames" ]]; then \
+              echo "Bad chars found\n$badfilenames"; \
+            else \
+              echo "All files passed file names check" \
+            if [[ ! -z "$badfilenames" ]]; then \
+              exit 1 \
+            else \
+              exit 0 \
       - name: Check Image Sizes
         run: |
           badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}') \
-            [[ ! -z "$badfilesizes" ]] && echo "Bad files found\n$badfilesizes" || echo "All files passed size check" \
-            [[ ! -z "$badfilesizes" ]] && exit 1 || exit 0
+            if [[ ! -z "$badfilesizes" ]]; then \
+              echo "Bad files found\n$badfilesizes"; \
+            else \
+              echo "All files passed file size check" \
+            if [[ ! -z "$badfilesizes" ]]; then \
+              exit 1 \
+            else \
+              exit 0 \
