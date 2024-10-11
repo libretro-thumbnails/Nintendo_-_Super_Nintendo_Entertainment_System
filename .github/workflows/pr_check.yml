@@ -43,7 +43,7 @@ jobs:
         if: always()
         run: |
           pass=0
-          find . -iname "*.png" -type f -not -path '*/.*' -print0 | while read -d $'\0' file
+          find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*' -print0 | while read -d $'\0' file
             do
               if [ -f "$file" ]; then
                 w=$(identify -format '%w' "$file")
