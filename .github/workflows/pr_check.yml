@@ -10,8 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check Image Types
+        if: always()
         run: |
-          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f | awk '{print $1}')
+          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f -not -path '*/.*' | awk '{print $1}')
             if [ ! -z "$badfiletypes" ]; then
               echo "Bad types found\n$badfiletypes"
             else
@@ -23,8 +24,9 @@ jobs:
               exit 0
             fi
       - name: Check Image Filenames
+        if: always()
         run: |
-          badfilenames=$(find ${{ github.workspace }} -iregex '.\/.*[<>&:`"\|\?\\\/\*].*' -type f | awk '{print $1}')
+          badfilenames=$(find ${{ github.workspace }} -iregex '.\/.*[<>&:`"\|\?\\\/\*].*' -type f -not -path '*/.*' | awk '{print $1}')
             if [ ! -z "$badfilenames" ]; then
               echo "Bad chars found\n$badfiletypes"
             else
@@ -36,8 +38,9 @@ jobs:
               exit 0
             fi
       - name: Check Image Sizes
+        if: always()
         run: |
-          badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}') \
+          badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*' -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}') \
             if [ ! -z "$badfilesizes" ]; then
               echo "Bad file sizes found\n$badfilesizes"
             else
