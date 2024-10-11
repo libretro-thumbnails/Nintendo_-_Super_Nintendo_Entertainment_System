@@ -14,7 +14,8 @@ jobs:
         run: |
           badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f -not -path '*/.*' | awk '{print $1}')
             if [ ! -z "$badfiletypes" ]; then
-              echo "Bad types found\n$badfiletypes"
+              echo "Bad types found"
+              echo $badfiletypes
             else
               echo "All files passed file type check"
             fi
@@ -28,7 +29,8 @@ jobs:
         run: |
           badfilenames=$(find ${{ github.workspace }} -iregex '.*[<>&:`"\|\?\\\/\*].*' -type f -not -path '*/.*' | awk '{print $1}')
             if [ ! -z "$badfilenames" ]; then
-              echo "Bad chars found\n$badfiletypes"
+              echo "Bad chars found"
+              echo $badfilenames
             else
               echo "All files passed file name check"
             fi
@@ -42,7 +44,8 @@ jobs:
         run: |
           badfilesizes=$(find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*' -exec identify -format '%w %h %i\n' '{}' \; | awk '$1>512 {print $3}')
             if [ ! -z "$badfilesizes" ]; then
-              echo "Bad file sizes found\n$badfilesizes"
+              echo "Bad file sizes found"
+              echo $badfilesizes
             else
               echo "All files passed file size check"
             fi
