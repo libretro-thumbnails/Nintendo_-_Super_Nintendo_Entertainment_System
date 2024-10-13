@@ -45,7 +45,7 @@ jobs:
         if: always()
         run: |
           pass=0
-          find ${{ github.workspace }} -iname "*.png" -type f -not -path '*/.*' -print0 | while read -d $'\0' file
+          while read -d $'\0' file
             do
               if [ -f "$file" ]; then
                 w=$(identify -format '%w' "$file")
@@ -54,5 +54,8 @@ jobs:
                   pass+=1
                 fi
               fi
-            done
+            done < <(find . -iname "*.png" -type f -not -path '*/.*' -print0)
+          if [ "$pass" != "0" ]; then
+            echo "One or more files failed size check"
+          fi
           exit $pass
