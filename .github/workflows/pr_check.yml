@@ -1,0 +1,61 @@
+name:  Check Images
+on:
+  workflow_dispatch:
+
+  pull_request:
+    types: [opened]
+
+jobs:
+  check_images:
+    name:  Check Images
+    runs-on:  ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Image Types
+        if: always()
+        run: |
+          badfiletypes=$(find ${{ github.workspace }} ! -iname "*.png" -type f -not -path '*/.*')
+            if [ ! -z "$badfiletypes" ]; then
+              echo "Bad types found"
+              echo $badfiletypes
+            else
+              echo "All files passed file type check"
+            fi
+            if [[ ! -z "$badfiletypes" ]]; then
+              exit 1
+            else
+              exit 0
+            fi
+      - name: Check Image Filenames
+        if: always()
+        run: |
+          badfilenames=$(find ${{ github.workspace }} -name '*[<>`?|"&*\\\/]*' -type f -not -path '*/.*')
+            if [ ! -z "$badfilenames" ]; then
+              echo "Bad chars found"
+              echo $badfilenames
+            else
+              echo "All files passed file name check"
+            fi
+            if [[ ! -z "$badfilenames" ]]; then
+              exit 1
+            else
+              exit 0
+            fi
+      - name: Check Image Sizes
+        if: always()
+        run: |
+          pass=0
+          while read -d $'\0' file
+            do
+              if [ -f "$file" ]; then
+                w=$(identify -format '%w' "$file")
+                if [ $w -gt 512 ]; then
+                  echo "File size too wide ($w pixels): $file"
+                  pass+=1
+                fi
+              fi
+            done < <(find . -iname "*.png" -type f -not -path '*/.*' -print0)
+          if [ "$pass" != "0" ]; then
+            echo "One or more files failed size check"
+          fi
+          exit $pass
